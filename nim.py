@@ -2,10 +2,9 @@
 
 import socket
 import sys
-import struct
-from select import select
 from struct import *
 from clientfunctions import game_seq_progress
+import client_contact
 
 
 def create_socket(hostname, port):
@@ -25,30 +24,18 @@ def create_socket(hostname, port):
 # initialize the connection, game
 def nim_client(hostname, port):
     global sock
-    there_is_input=0 # input accepted?
     create_socket(hostname,port)
-    inputs=[sys.stdin,sock], outputs=[sock]
-    soc_to_mess={sys.stdin:b"",sock:b""}
     while True:
-        readable,writeable,exp=select(inputs,outputs,[])
-        for obj in readable:
-            if obj is sock:
-                packed = obj.recv(20)  # 4*4+4 in case of sock
-                if packed is None:
-                    print("Disconnected from server\n")
-                    sys.exit(1)
-                data = unpack(">iiii", packed)
-                soc_to_mess[obj] += data
-                if soc_to_mess[obj][-4:]==b"mesg":
-                    message_type, heap_A, heap_B, heap_C = soc_to_mess[obj][:4]
-                    if there_is_input:
-                        game_continues = game_seq_progress(obj, message_type, heap_A, heap_B, heap_C)
-            '''else:
-                msg=obj.recv(12)
-                if len(msg)==0: # need to change condition
-                    there_is_input=1
-                else:
-                    soc_to_mess[obj] +=msg'''
+        data= client_contact.my_recv_client(20, sock, [sock, sys.stdin], [], {sock: b"", sys.stdin: b""}, {})
+        res=unpack(">iiii",data[:-4])
+        message_type,heap_A,heap_B,heap_C=res
+        game_continues=game_seq_progress(sock,message_type,heap_A,heap_B,heap_C)
+        if game_continues is not True:
+            sock.close()
+            sys.exit(1)
+
+
+
 
 
 # get inputs for connection of client side
