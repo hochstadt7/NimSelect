@@ -58,12 +58,12 @@ def nim_client(hostname, port):
                         recv_dict[sys.stdin]=b""
 
             else:
-                packed = obj.recv(20) # will accept message when server sent nothing but didn't disconnect? if so, how can I overcome it
+                packed = obj.recv(20) # expect 20 bytes- 3 int's and 4 chars "mesg"
                 if packed is None:
                     print("Disconnected from server\n")
                     sys.exit(1)
                 recv_dict[obj] += packed
-                if recv_dict[obj][-4:] == b"mesg":  # we read all info for main_sock
+                if recv_dict[obj][-4:] == b"mesg":  # we read all the info
                     data=unpack(">iiii",recv_dict[obj][:-4])
                     message_type, heap_A, heap_B, heap_C =data
                     expect_input=1
@@ -73,7 +73,7 @@ def nim_client(hostname, port):
                         sys.exit(1)
 
         for obj in writable:
-            bytes_sent=obj.send(20) # expect 20 bytes- 4 int's and "mesg" (4 chars)
+            bytes_sent=obj.send(12) # expect 12 bytes- 3 int's
             send_dict[sock] =send_dict[sock+bytes_sent]
             if send_dict[sock]==b"": # finished to send
                 outputs.remove(obj)
