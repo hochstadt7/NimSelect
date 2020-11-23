@@ -15,6 +15,7 @@ def my_recv_server(num_bytes,main_sock,connection,inputs,outputs,recv_dict,send_
         for obj in readable:
             if obj is connection:
                 new_conn,addr=obj.accept()
+                # need to check waiting list
                 inputs.add(obj)
                 outputs.add(obj)
                 recv_dict[new_conn]=b""

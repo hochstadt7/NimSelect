@@ -32,19 +32,31 @@ def bind_socket(port):
         sys.exit(1)
 
 
+def start_game(sock,heaps,num_players,wait_list_size,current_players):
+    while current_players:
+
+
+
+
 def nim_server(n_a, n_b, n_c,num_players,wait_list_size ,port):
     global sock
-    current_players=[],waiting_list=[]
     create_socket(port)
     bind_socket(port)
-    heaps[0] = n_a
-    heaps[1] = n_b
-    heaps[2] = n_c
     sock.listen(wait_list_size)
 
     while True:
-        # accept
-        data= server_contact.my_recv_server()
+        try:
+            conn, addr = sock.accept()
+            print('Connected by', addr)
+        except OSError as error:
+            print("Failed accept connection\n")
+            sys.exit(1)
+        heaps[0] = n_a
+        heaps[1] = n_b
+        heaps[2] = n_c
+        current_players = [conn]
+
+        start_game(conn, heaps,num_players,wait_list_size,current_players)
 
 
 
