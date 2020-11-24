@@ -40,7 +40,7 @@ def nim_client(hostname, port):
                 packed = obj.recv(12)
                 recv_dict[obj] += packed
                 if recv_dict[obj][-1:] == "\n":
-                    if recv_dict[obj] == "Q": # quit
+                    if len(recv_dict[obj])==1 and recv_dict[obj] == "Q": # quit
                         sock.close()
                         sys.exit(1)
                     if not expect_input:
@@ -58,7 +58,7 @@ def nim_client(hostname, port):
                         recv_dict[sys.stdin]=b""
 
             else:
-                packed = obj.recv(20) # expect 20 bytes- 3 int's and 4 chars "mesg"
+                packed = obj.recv(4) # expect 20 bytes- 3 int's and 4 chars "mesg"
                 if packed is None:
                     print("Disconnected from server\n")
                     sys.exit(1)
@@ -73,7 +73,7 @@ def nim_client(hostname, port):
                         sys.exit(1)
 
         for obj in writable:
-            bytes_sent=obj.send(12) # expect 12 bytes- 3 int's
+            bytes_sent=obj.send(4) # expect 12 bytes- 3 int's
             send_dict[sock] =send_dict[sock+bytes_sent]
             if send_dict[sock]==b"": # finished to send
                 outputs.remove(obj)

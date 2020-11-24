@@ -2,7 +2,10 @@
 def game_seq_progress(message_type, heap_A):  # Returns True if game continues and False if game is over.
     indicator = True
     if (message_type == 0):  # INITIAL SERVER MESSAGE
-        print("Now you are playing against the server!")
+        if heap_A==0: # we will set heap_A to 0 iff client now play, otherwise to 1
+            print("Now you are playing against the server!")
+        else:
+            print("Waiting to play against the server.")
     elif (message_type == 1):  # LEGAL MOVE
         print("Move accepted")
     elif (message_type == 2):  # ILLEGAL MOVE
@@ -16,7 +19,7 @@ def game_seq_progress(message_type, heap_A):  # Returns True if game continues a
     elif (message_type == 5):  # instead of QUIT- illegal and gameover both
         print("Illegal move")
         print(f"Heap A: 0", f"Heap_B: 0", f"Heap C: 0", sep="\n")
-        if (heap_A == 0): # we will set heap_A to 0 iff client wins, otherwise to 1
+        if heap_A == 0: # we will set heap_A to 0 iff client wins, otherwise to 1
             print("You win!")
         else:
             print("Server win!")
