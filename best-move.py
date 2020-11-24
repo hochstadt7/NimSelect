@@ -1,3 +1,5 @@
+# we can use this for the bonus
+
 def compute_nim_sum(heaps,num_heaps):
     nim_sum=0
     for index in range(num_heaps):

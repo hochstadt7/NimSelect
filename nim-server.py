@@ -54,7 +54,7 @@ def start_game(sock,heaps,num_players,wait_list_size,current_players):
                     if len(wait_list) < wait_list_size:
                         wait_and_play.append(conn)
                         wait_list.append(conn)
-                        send_dict[conn] = pack(">iiii", 0, 0, 0, 0, "mesg")  # message to send
+                        send_dict[conn] = pack(">iiii4c", 0, 0, 0, 0, "mesg")  # message to send
                     # need to make else case if get refused connection?
             else:
                 packed = obj.recv(4)  # expect 12 bytes- 3 int's
@@ -86,14 +86,14 @@ def start_game(sock,heaps,num_players,wait_list_size,current_players):
                         cube_left=heap_sum(heaps)
                         if cube_left==0:
                             if validity == "Legal":
-                                send_dict[obj]=pack(">iiii",3,0,0,0,"mesg")
+                                send_dict[obj]=pack(">iiii4c",3,0,0,0,"mesg")
                             else:
-                                send_dict[obj] = pack(">iiii", 5, 0, 0, 0, "mesg") # I am not sure this case is possible- illegal move of client and client win? remove this else
+                                send_dict[obj] = pack(">iiii4c", 5, 0, 0, 0, "mesg") # I am not sure this case is possible- illegal move of client and client win? remove this else
                         elif cube_left==1:
                             if validity == "Legal":
-                                send_dict[obj] = pack(">iiii", 4, 0, 0, 0,"mesg")
+                                send_dict[obj] = pack(">iiii4c", 4, 0, 0, 0,"mesg")
                             else:
-                                send_dict[obj] = pack(">iiii", 5, 1, 0, 0, "mesg") # server win but client move was illegal
+                                send_dict[obj] = pack(">iiii4c", 5, 1, 0, 0, "mesg") # server win but client move was illegal
                         else:
                             server_heap_choice(heaps)
                             send_dict[obj]=pack(">iiii4c",2,heaps[0],heaps[1],heaps[2],"mesg")

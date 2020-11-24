@@ -51,9 +51,9 @@ def nim_client(hostname, port):
                             heap_letter, num = recv_dict[obj].split()
                             num = int(num)
                             heap_num = clientfunctions.pick_heap_num(heap_letter)
-                            send_dict[sock]=pack(">iii", 0, heap_num, num) # message for server
+                            send_dict[sock]=pack(">iii4c", 0, heap_num, num,"mesg") # message for server
                         else:
-                            send_dict[sock]=pack(">iii", 2, 0, 0)
+                            send_dict[sock]=pack(">iii4c", 2, 0, 0,"mesg")
                         outputs.append(sock)  # want to be able to send to server
                         recv_dict[sys.stdin]=b""
 
