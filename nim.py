@@ -24,27 +24,24 @@ def create_socket(hostname, port):
 # initialize the connection, game
 def nim_client(hostname, port):
     global sock
-    inputs=[sys.stdin,sock]
+    inputs=[sys.stdin]
     outputs = []
-    recv_dict={sys.stdin:b"",sock:b""}
-    send_dict = {}
+    recv_dict={sys.stdin:"",sock:b""} # is it important to append sock to list after create_socket()? don't think so..
+    send_dict = {sock:b""}
     expect_input=0
     create_socket(hostname,port)
-    recv_dict[sock]=b""
-    send_dict[sock]=b""
-    inputs.append(sock)
     while True:
         readable,writable,exp=select(inputs,outputs,[])
         for obj in readable:
             if obj is sys.stdin:
-                packed = obj.recv(12)
+                packed = obj.recv(3)
                 recv_dict[obj] += packed
                 if recv_dict[obj][-1:] == "\n":
                     if len(recv_dict[obj])==1 and recv_dict[obj] == "Q": # quit
                         sock.close()
                         sys.exit(1)
                     if not expect_input:
-                        recv_dict[obj]=b"" # too early input get dropped?
+                        recv_dict[obj]="" # too early input get dropped?
                     else:
                         expect_input=0 # cuz now we already have input
                         if clientfunctions.is_valid_input(recv_dict[obj]):
@@ -55,7 +52,7 @@ def nim_client(hostname, port):
                         else:
                             send_dict[sock]=pack(">iii4c", 2, 0, 0,"mesg")
                         outputs.append(sock)  # want to be able to send to server
-                        recv_dict[sys.stdin]=b""
+                        recv_dict[sys.stdin]=""
 
             else:
                 packed = obj.recv(4) # expect 20 bytes- 3 int's and 4 chars "mesg"

@@ -36,7 +36,6 @@ def bind_socket(port):
 def start_game(sock,heaps,num_players,wait_list_size,current_players):
     wait_list=[] # list of waiting players
     wait_and_play=[sock,current_players[0]] # list of waiting players and current players and accepting socket
-    outputs=[]
     recv_dict = {sock: b"",current_players[0]:b""}
     send_dict = {current_players[0]:b""}
     while current_players:
@@ -48,7 +47,6 @@ def start_game(sock,heaps,num_players,wait_list_size,current_players):
                 if len(current_players)<num_players:
                     wait_and_play.append(conn)
                     current_players.append(conn)
-                    outputs.append(conn)
                     send_dict[conn] = pack(">iiii4c", 0, 1, 0, 0,"mesg")  # message to send
                 else:
                     if len(wait_list) < wait_list_size:
@@ -97,16 +95,13 @@ def start_game(sock,heaps,num_players,wait_list_size,current_players):
                         else:
                             server_heap_choice(heaps)
                             send_dict[obj]=pack(">iiii4c",2,heaps[0],heaps[1],heaps[2],"mesg")
-                        outputs.append(obj)
 
 
         for obj in writable:
             bytes_sent = obj.send(4)  # expect 20 bytes- 3 int's and 4 chars "mesg"
             send_dict[sock] = send_dict[sock + bytes_sent]
             if send_dict[sock] == b"":  # finished to send
-                outputs.remove(obj)
                 send_dict[obj] = b""
-                outputs.remove(obj) # cuz doesnt have a message(?) or should i keep it? but than it might send empty message?
 
 
 
