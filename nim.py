@@ -24,12 +24,12 @@ def create_socket(hostname, port):
 # initialize the connection, game
 def nim_client(hostname, port):
     global sock
-    inputs=[sys.stdin]
-    outputs = []
-    recv_dict={sys.stdin:"",sock:b""} # is it important to append sock to list after create_socket()? don't think so..
-    send_dict = {sock:b""}
-    expect_input=0
     create_socket(hostname,port)
+    inputs = [sys.stdin]
+    outputs = []
+    recv_dict = {sys.stdin: "",sock: b""}  # is it important to append sock to list after create_socket()? yes, think so..
+    send_dict = {sock: b""}
+    expect_input = 0
     while True:
         readable,writable,exp=select(inputs,outputs,[])
         for obj in readable:
@@ -52,7 +52,7 @@ def nim_client(hostname, port):
                         else:
                             send_dict[sock]=pack(">iii4c", 2, 0, 0,"mesg")
                         outputs.append(sock)  # want to be able to send to server
-                        recv_dict[sys.stdin]=""
+                        recv_dict[obj]=""
 
             else:
                 packed = obj.recv(4) # expect 20 bytes- 3 int's and 4 chars "mesg"
@@ -62,12 +62,14 @@ def nim_client(hostname, port):
                 recv_dict[obj] += packed
                 if recv_dict[obj][-4:] == b"mesg":  # we read all the info
                     data=unpack(">iiii",recv_dict[obj][:-4])
+                    recv_dict[obj] = b""
                     message_type, heap_A, heap_B, heap_C =data
                     expect_input=1
                     game_continue= clientfunctions.game_seq_progress(message_type, heap_A)
                     if not game_continue:
                         sock.close()
                         sys.exit(1)
+
 
         for obj in writable:
             bytes_sent=obj.send(4) # expect 12 bytes- 3 int's
