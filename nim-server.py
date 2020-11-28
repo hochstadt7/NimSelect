@@ -14,20 +14,20 @@ def create_socket():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     except OSError as error:
-        print("Failed to initialize connection\n")
+        print("Failed to initialize socket\n")
         sys.exit(1)##do i need to quit like this
 
 
 # bind the socket to the port
-def bind_socket(port):
+def bind_socket(port,wait_list_size):
 
     global sock
     try:
         sock.bind(('', port))
-        sock.listen(1)
+        sock.listen(wait_list_size)
 
     except OSError as error:
-        print("Failed to initialize connection\n")
+        print("Failed to initialize binding\n")
         sys.exit(1)
 
 
@@ -43,22 +43,27 @@ def start_game(sock,num_players,wait_list_size,current_players):
         readable,writable,exp=select(wait_and_play,outputs,[])
         for obj in readable:
             if obj is sock:
-                conn, addr = sock.accept()
-                print("connected by: ", addr)
-                if len(current_players)<num_players:
-                    wait_and_play.append(conn)
-                    current_players.append(conn)
-                    send_dict[conn] = pack(">iiii4c", 0, 1, 0, 0,"mesg")  # message to send
-                    outputs.append(conn)
-                    heap_dict[conn]={"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
-                else:
-                    if len(wait_list) < wait_list_size:
+                try:
+                    conn, addr = sock.accept()
+                    print("connected by: ", addr)
+                    if len(current_players)<num_players:
                         wait_and_play.append(conn)
-                        wait_list.append(conn)
-                        send_dict[conn] = pack(">iiii4c", 0, 0, 0, 0, "mesg")  # message to send
+                        current_players.append(conn)
+                        send_dict[conn] = pack(">iiii4c", 0, 1, 0, 0,"mesg")  # message to send
                         outputs.append(conn)
+                        heap_dict[conn]={"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
                     else:
-                         conn.close() # immidiately closeure
+                        if len(wait_list) < wait_list_size:
+                            wait_and_play.append(conn)
+                            wait_list.append(conn)
+                            send_dict[conn] = pack(">iiii4c", 0, 0, 0, 0, "mesg")  # message to send
+                            outputs.append(conn)
+                        else:
+                             conn.close() # immidiately closeure
+                except OSError as error:
+                    print("Failed to initialize connection with the client\n")
+
+
             else:
                 packed = obj.recv(4)  # expect 16 bytes- 3 int's+ 4 chars
                 if packed is None:
@@ -121,8 +126,7 @@ def nim_server(n_a, n_b, n_c,num_players,wait_list_size ,port):
     global sock
     global heaps
     create_socket()
-    bind_socket(port)
-    sock.listen(wait_list_size)
+    bind_socket(port,wait_list_size)
     heaps={}
     while True:
         try:
