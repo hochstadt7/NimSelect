@@ -36,12 +36,13 @@ def start_game(sock,num_players,wait_list_size,current_players):
     wait_list=[] # list of waiting players
     wait_and_play=[sock,current_players[0]] # list of waiting players and current players and accepting socket
     recv_dict = {sock: b"",current_players[0]:b""}
-    send_dict = {current_players[0]:b""}
+    send_dict = {current_players[0]:pack(">iiii4s", 0, heaps["A"], heaps["B"], heaps["C"], "mesg".encode())} # assume number of players>0
     heap_dict={current_players[0]: {"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}}
     outputs = current_players
     while current_players:
         readable,writable,exp=select(wait_and_play,outputs,[])
         for obj in readable:
+            print("sec move")
             if obj is sock:
                 try:
                     conn, addr = sock.accept()
@@ -49,14 +50,15 @@ def start_game(sock,num_players,wait_list_size,current_players):
                     if len(current_players)<num_players:
                         wait_and_play.append(conn)
                         current_players.append(conn)
-                        send_dict[conn] = pack(">iiii4c", 0, 1, 0, 0,"mesg")  # message to send
+                        heap_dict[conn]={"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
+                        send_dict[conn] = pack(">iiii4s", 0, heaps["A"], heaps["B"], heaps["C"],"mesg".encode())  # message to send
                         outputs.append(conn)
                         heap_dict[conn]={"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
                     else:
                         if len(wait_list) < wait_list_size:
                             wait_and_play.append(conn)
                             wait_list.append(conn)
-                            send_dict[conn] = pack(">iiii4c", 0, 0, 0, 0, "mesg")  # message to send
+                            send_dict[conn] = pack(">iiii4s", 6, heaps["A"], heaps["B"], heaps["C"], "mesg".encode())  # message to send
                             outputs.append(conn)
                         else:
                              conn.close() # immidiately closeure
@@ -65,6 +67,7 @@ def start_game(sock,num_players,wait_list_size,current_players):
 
 
             else:
+                print("sec move")
                 packed = obj.recv(4)  # expect 16 bytes- 3 int's+ 4 chars
                 if packed is None:
                     print("Disconnected from client")
@@ -86,6 +89,7 @@ def start_game(sock,num_players,wait_list_size,current_players):
                         new_player=wait_list[0]
                         current_players.append(new_player)
                         recv_dict[new_player]=b""
+                        heap_dict[new_player] = {"A": heaps["A"], "B": heaps["B"], "C": heaps["C"]}
                         wait_list.remove(new_player)
 
                 else:
@@ -100,26 +104,26 @@ def start_game(sock,num_players,wait_list_size,current_players):
                         cube_left=heap_sum(heaps)
                         if cube_left==0:
                             if validity == "Legal":
-                                send_dict[obj]=pack(">iiii4c",3,0,0,0,"mesg")
-                            else:
-                                send_dict[obj] = pack(">iiii4c", 5, 0, 0, 0, "mesg") # I am not sure this case is possible- illegal move of client and client win? remove this else
+                                send_dict[obj]=pack(">iiii4s",3,heap_dict[obj]["A"], heap_dict[obj]["B"], heap_dict[obj]["C"],"mesg".encode())
+                            # else case isn't possible
                         elif cube_left==1:
                             if validity == "Legal":
-                                send_dict[obj] = pack(">iiii4c", 4, 0, 0, 0,"mesg")
+                                send_dict[obj] = pack(">iiii4s", 4, heap_dict[obj]["A"], heap_dict[obj]["B"], heap_dict[obj]["C"],"mesg".encode())
                             else:
-                                send_dict[obj] = pack(">iiii4c", 5, 1, 0, 0, "mesg") # server win but client move was illegal
+                                send_dict[obj] = pack(">iiii4s", 5, heap_dict[obj]["A"], heap_dict[obj]["B"], heap_dict[obj]["C"], "mesg".encode()) # server win but client move was illegal
                         else:
                             server_heap_choice(heap_dict[obj])
-                            send_dict[obj]=pack(">iiii4c",2,heap_dict[obj]["A"],heap_dict[obj]["B"],heap_dict[obj]["C"],"mesg")
+                            send_dict[obj]=pack(">iiii4s",2,heap_dict[obj]["A"],heap_dict[obj]["B"],heap_dict[obj]["C"],"mesg".encode())
 
 
 
         for obj in writable:
-            bytes_sent = obj.send(4)  # expect 20 bytes- 3 int's and 4 chars "mesg"
-            send_dict[obj] = send_dict[obj + bytes_sent]
-            if send_dict[obj] == b"":  # finished to send
+            print("aaaaaaaaaaaaa")
+            bytes_sent = obj.send(send_dict[obj][:4])  # expect 20 bytes- 3 int's and 4 chars "mesg"
+            send_dict[obj] = send_dict[obj][bytes_sent:]
+
+            if send_dict[obj] == b"":  # finished to end
                 outputs.remove(obj)
-                send_dict[obj] =b""
 
 
 def nim_server(n_a, n_b, n_c,num_players,wait_list_size ,port):

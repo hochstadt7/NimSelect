@@ -25,34 +25,35 @@ def create_socket(hostname, port):
 def nim_client(hostname, port):
     global sock
     create_socket(hostname,port)
-    inputs = [sys.stdin]
+    inputs = [sock,sys.stdin]
     outputs = []
     recv_dict = {sys.stdin: "",sock: b""}  # is it important to append sock to list after create_socket()? yes, think so..
     send_dict = {sock: b""}
     expect_input = 0
+
     while True:
         readable,writable,exp=select(inputs,outputs,[])
         for obj in readable:
             if obj is sys.stdin:
-                packed = obj.recv(3)
+                packed = input()
+
                 recv_dict[obj] += packed
-                if recv_dict[obj][-1:] == "\n":
-                    if len(recv_dict[obj])==1 and recv_dict[obj] == "Q": # quit
-                        sock.close()
-                        sys.exit(1)
-                    if not expect_input:
-                        recv_dict[obj]="" # too early input get dropped?
+                if len(recv_dict[obj]) == 1 and recv_dict[obj] == "Q":  # quit
+                    sock.close()
+                    sys.exit(1)
+                if not expect_input:
+                    recv_dict[obj] = ""  # too early input get dropped?
+                else:
+                    expect_input = 0  # cuz now we already have input
+                    if clientfunctions.is_valid_input(recv_dict[obj]):
+                        heap_letter, num = recv_dict[obj].split()
+                        num = int(num)
+                        heap_num = clientfunctions.pick_heap_num(heap_letter)
+                        send_dict[sock] = pack(">iii4s", 0, heap_num, num, "mesg".encode())  # message for server
                     else:
-                        expect_input=0 # cuz now we already have input
-                        if clientfunctions.is_valid_input(recv_dict[obj]):
-                            heap_letter, num = recv_dict[obj].split()
-                            num = int(num)
-                            heap_num = clientfunctions.pick_heap_num(heap_letter)
-                            send_dict[sock]=pack(">iii4c", 0, heap_num, num,"mesg") # message for server
-                        else:
-                            send_dict[sock]=pack(">iii4c", 2, 0, 0,"mesg")
-                        outputs.append(sock)  # want to be able to send to server
-                        recv_dict[obj]=""
+                        send_dict[sock] = pack(">iii4s", 2, 0, 0, "mesg".encode())
+                    outputs.append(sock)  # want to be able to send to server
+                    recv_dict[obj] = ""
 
             else:
                 packed = obj.recv(4) # expect 20 bytes- 3 int's and 4 chars "mesg"
@@ -60,23 +61,27 @@ def nim_client(hostname, port):
                     print("Disconnected from server\n")
                     sys.exit(1)
                 recv_dict[obj] += packed
-                if recv_dict[obj][-4:] == b"mesg":  # we read all the info
+                print(recv_dict[obj][-4:])
+                if recv_dict[obj][-4:]== b"mesg":  # we read all the info
                     data=unpack(">iiii",recv_dict[obj][:-4])
                     recv_dict[obj] = b""
                     message_type, heap_A, heap_B, heap_C =data
-                    expect_input=1
-                    game_continue= clientfunctions.game_seq_progress(message_type, heap_A)
+                    game_continue= clientfunctions.game_seq_progress(message_type, heap_A,heap_B, heap_C)
+
                     if not game_continue:
                         sock.close()
                         sys.exit(1)
+                    if not message_type == 6: # the only case we dont want an input (except Q)
+                        expect_input = 1
 
 
         for obj in writable:
-            bytes_sent=obj.send(4) # expect 12 bytes- 3 int's
-            send_dict[sock] =send_dict[sock+bytes_sent]
+
+            bytes_sent=obj.send(send_dict[obj][:4]) # expect 12 bytes- 3 int's
+            send_dict[obj] =send_dict[obj][bytes_sent:]
             if send_dict[sock]==b"": # finished to send
                 outputs.remove(obj)
-                send_dict[obj]=b""
+                print("sent")
 
 
 # get inputs for connection of client side
