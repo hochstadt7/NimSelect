@@ -36,7 +36,6 @@ def nim_client(hostname, port):
         for obj in readable:
             if obj is sys.stdin:
                 packed = input()
-
                 recv_dict[obj] += packed
                 if len(recv_dict[obj]) == 1 and recv_dict[obj] == "Q":  # quit
                     sock.close()
@@ -44,15 +43,16 @@ def nim_client(hostname, port):
                 if not expect_input:
                     recv_dict[obj] = ""  # too early input get dropped?
                 else:
+                    print("Hello!")
                     expect_input = 0  # cuz now we already have input
                     if clientfunctions.is_valid_input(recv_dict[obj]):
                         heap_letter, num = recv_dict[obj].split()
                         num = int(num)
                         heap_num = clientfunctions.pick_heap_num(heap_letter)
-                        send_dict[sock] = pack(">iii4s", 0, heap_num, num, "mesg".encode())  # message for server
+                        send_dict[obj] = pack(">iii4s", 0, heap_num, num, "mesg".encode())  # message for server
                     else:
-                        send_dict[sock] = pack(">iii4s", 2, 0, 0, "mesg".encode())
-                    outputs.append(sock)  # want to be able to send to server
+                        send_dict[obj] = pack(">iii4s", 2, 0, 0, "mesg".encode())
+                    outputs.append(obj)  # want to be able to send to server
                     recv_dict[obj] = ""
 
             else:
@@ -63,10 +63,11 @@ def nim_client(hostname, port):
                 recv_dict[obj] += packed
                 print(recv_dict[obj][-4:])
                 if recv_dict[obj][-4:]== b"mesg":  # we read all the info
-                    data=unpack(">iiii",recv_dict[obj][:-4])
+                    data = unpack(">iiii",recv_dict[obj][:-4])
                     recv_dict[obj] = b""
                     message_type, heap_A, heap_B, heap_C =data
-                    game_continue= clientfunctions.game_seq_progress(message_type, heap_A,heap_B, heap_C)
+                    print(f"Message type: {message_type}")
+                    game_continue = clientfunctions.game_seq_progress(message_type, heap_A,heap_B, heap_C)
 
                     if not game_continue:
                         sock.close()

@@ -31,7 +31,7 @@ def bind_socket(port,wait_list_size):
         sys.exit(1)
 
 
-def start_game(sock,num_players,wait_list_size,current_players):
+def start_game(sock, num_players, wait_list_size, current_players):
     global heaps
     wait_list=[] # list of waiting players
     wait_and_play=[sock,current_players[0]] # list of waiting players and current players and accepting socket
@@ -42,7 +42,9 @@ def start_game(sock,num_players,wait_list_size,current_players):
     while current_players:
         readable, writable, exp = select(wait_and_play,outputs,[])
 
-        print(len(readable))
+        print(f"The length of readable is {len(readable)}")
+        print(f"The length of writable is {len(writable)}")
+
         for obj in readable:
             print("sec move")
             if obj is sock:
@@ -56,7 +58,7 @@ def start_game(sock,num_players,wait_list_size,current_players):
                         send_dict[conn] = pack(">iiii4s", 0, heaps["A"], heaps["B"], heaps["C"],"mesg".encode())  # message to send
                         print(send_dict[conn])
                         outputs.append(conn)
-                        heap_dict[conn]={"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
+                        heap_dict[conn] = {"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
                     else:
                         if len(wait_list) < wait_list_size:
                             wait_and_play.append(conn)
@@ -89,9 +91,9 @@ def start_game(sock,num_players,wait_list_size,current_players):
                         outputs.remove(obj)
                     if len(wait_list)>0:
                         # append new player from waiting list
-                        new_player=wait_list[0]
+                        new_player = wait_list[0]
                         current_players.append(new_player)
-                        recv_dict[new_player]=b""
+                        recv_dict[new_player] = b""
                         heap_dict[new_player] = {"A": heaps["A"], "B": heaps["B"], "C": heaps["C"]}
                         wait_list.remove(new_player)
 
@@ -117,7 +119,6 @@ def start_game(sock,num_players,wait_list_size,current_players):
                         else:
                             server_heap_choice(heap_dict[obj])
                             send_dict[obj]=pack(">iiii4s",2,heap_dict[obj]["A"],heap_dict[obj]["B"],heap_dict[obj]["C"],"mesg".encode())
-
 
 
         for obj in writable:
