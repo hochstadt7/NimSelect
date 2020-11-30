@@ -42,3 +42,5 @@ def reset_heap(heap, a, b, c):
     heap["C"] = c
 
     return heap
+
+

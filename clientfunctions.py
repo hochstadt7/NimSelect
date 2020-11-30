@@ -3,24 +3,24 @@ def game_seq_progress(message_type, heap_a,heap_b,heap_c):  # Returns True if ga
     indicator = True
     if (message_type == 0):  # INITIAL SERVER MESSAGE
         print("Now you are playing against the server!")
-        print(f"Heap A: {heap_a}", f"Heap_B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
+        print(f"Heap A: {heap_a}", f"Heap B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
         print("Your turn:")
     elif (message_type == 1):  # LEGAL MOVE
         print("Move accepted")
-        print(f"Heap A: {heap_a}", f"Heap_B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
+        print(f"Heap A: {heap_a}", f"Heap B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
         print("Your turn:")
     elif (message_type == 2):  # ILLEGAL MOVE
         print("Illegal move")
-        print(f"Heap A: {heap_a}", f"Heap_B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
+        print(f"Heap A: {heap_a}", f"Heap B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
         print("Your turn:")
     elif (message_type == 3):  # WIN
         print("Move accepted")
-        print(f"Heap A: {heap_a}", f"Heap_B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
+        print(f"Heap A: {heap_a}", f"Heap B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
         print("You win!")
         indicator = False
     elif (message_type == 4):  # LOSE
         print("Move accepted")
-        print(f"Heap A: {heap_a}", f"Heap_B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
+        print(f"Heap A: {heap_a}", f"Heap B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
         print("Server win!")
         indicator = False
     elif (message_type == 5):  # instead of QUIT- illegal and gameover both

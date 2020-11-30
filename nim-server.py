@@ -15,7 +15,7 @@ def create_socket():
 
     except OSError as error:
         print("Failed to initialize socket\n")
-        sys.exit(1)##do i need to quit like this
+        sys.exit(1)  #do i need to quit like this
 
 
 # bind the socket to the port
@@ -34,17 +34,14 @@ def bind_socket(port,wait_list_size):
 def start_game(sock, num_players, wait_list_size, current_players):
     global heaps
     wait_list=[] # list of waiting players
-    wait_and_play=[sock,current_players[0]] # list of waiting players and current players and accepting socket
+    wait_and_play=[sock, current_players[0]] # list of waiting players and current players and accepting socket
     recv_dict = {sock: b"",current_players[0]:b""}
     send_dict = {current_players[0]:pack(">iiii4s", 0, heaps["A"], heaps["B"], heaps["C"], "mesg".encode())} # assume number of players>0
-    heap_dict={current_players[0]: {"A": heaps["A"], "B": heaps["B"],"C" : heaps["C"]}}
+    heap_dict = {current_players[0]: {"A": heaps["A"], "B": heaps["B"], "C": heaps["C"]}}
     outputs = current_players
     while current_players:
-        readable, writable, exp = select(wait_and_play,outputs,[])
-
-        print(f"The length of readable is {len(readable)}")
-        print(f"The length of writable is {len(writable)}")
-
+        readable, writable, exp = select(wait_and_play, outputs, [])
+        print(len(writable))
         for obj in readable:
             print("sec move")
             if obj is sock:
@@ -56,7 +53,6 @@ def start_game(sock, num_players, wait_list_size, current_players):
                         current_players.append(conn)
                         heap_dict[conn]={"A": heaps["A"], "B": heaps["B"], "C": heaps["C"]}
                         send_dict[conn] = pack(">iiii4s", 0, heaps["A"], heaps["B"], heaps["C"],"mesg".encode())  # message to send
-                        print(send_dict[conn])
                         outputs.append(conn)
                         heap_dict[conn] = {"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
                     else:
@@ -69,7 +65,6 @@ def start_game(sock, num_players, wait_list_size, current_players):
                              conn.close() # immidiately closeure
                 except OSError as error:
                     print("Failed to initialize connection with the client\n")
-
 
             else:
                 print("sec move")
@@ -98,18 +93,19 @@ def start_game(sock, num_players, wait_list_size, current_players):
                         wait_list.remove(new_player)
 
                 else:
+                    print(f"{packed.decode()}")
                     recv_dict[obj] += packed
                     if recv_dict[obj][-4:] == b"mesg":  # we read all the info
                         outputs.append(obj)
                         data = unpack(">iii", recv_dict[obj][:-4])
                         recv_dict[obj] = b""
                         message_type, heap_num, num_taken = data
-                        heaps=bring_heap_letter(heap_num)
-                        validity=choice_validity(heap_dict[obj],heap_num,num_taken)
-                        cube_left=heap_sum(heaps)
-                        if cube_left==0:
+                        heaps = bring_heap_letter(heap_num)
+                        validity = choice_validity(heap_dict[obj], heap_num, num_taken)
+                        cube_left = heap_sum(heaps)
+                        if cube_left == 0:
                             if validity == "Legal":
-                                send_dict[obj]=pack(">iiii4s",3, heap_dict[obj]["A"], heap_dict[obj]["B"], heap_dict[obj]["C"],"mesg".encode())
+                                send_dict[obj]=pack(">iiii4s", 3, heap_dict[obj]["A"], heap_dict[obj]["B"], heap_dict[obj]["C"],"mesg".encode())
                             # else case isn't possible
                         elif cube_left==1:
                             if validity == "Legal":
@@ -122,6 +118,7 @@ def start_game(sock, num_players, wait_list_size, current_players):
 
 
         for obj in writable:
+
             bytes_sent = obj.send(send_dict[obj][:4])# expect 20 bytes- 3 int's and 4 chars "mesg"
             send_dict[obj] = send_dict[obj][bytes_sent:]
 
@@ -138,6 +135,7 @@ def nim_server(n_a, n_b, n_c,num_players,wait_list_size ,port):
     while True:
         try:
             conn, addr = sock.accept()
+
             print('Connected by', addr)
         except OSError as error:
             print("Failed accept connection\n")
@@ -154,7 +152,7 @@ def nim_server(n_a, n_b, n_c,num_players,wait_list_size ,port):
 
 if __name__ == '__main__':
     if len(sys.argv) != 6 and len(sys.argv) != 7:
-        print("Unappropriate arguments\n")
+        print("Inappropriate arguments\n")
         sys.exit(1)
 
     if len(sys.argv) == 7:
