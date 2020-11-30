@@ -37,10 +37,12 @@ def start_game(sock,num_players,wait_list_size,current_players):
     wait_and_play=[sock,current_players[0]] # list of waiting players and current players and accepting socket
     recv_dict = {sock: b"",current_players[0]:b""}
     send_dict = {current_players[0]:pack(">iiii4s", 0, heaps["A"], heaps["B"], heaps["C"], "mesg".encode())} # assume number of players>0
-    heap_dict={current_players[0]: {"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}}
+    heap_dict={current_players[0]: {"A": heaps["A"], "B": heaps["B"],"C" : heaps["C"]}}
     outputs = current_players
     while current_players:
-        readable,writable,exp=select(wait_and_play,outputs,[])
+        readable, writable, exp = select(wait_and_play,outputs,[])
+
+        print(len(readable))
         for obj in readable:
             print("sec move")
             if obj is sock:
@@ -50,8 +52,9 @@ def start_game(sock,num_players,wait_list_size,current_players):
                     if len(current_players)<num_players:
                         wait_and_play.append(conn)
                         current_players.append(conn)
-                        heap_dict[conn]={"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
+                        heap_dict[conn]={"A": heaps["A"], "B": heaps["B"], "C": heaps["C"]}
                         send_dict[conn] = pack(">iiii4s", 0, heaps["A"], heaps["B"], heaps["C"],"mesg".encode())  # message to send
+                        print(send_dict[conn])
                         outputs.append(conn)
                         heap_dict[conn]={"A": heaps["A"],"B": heaps["B"],"C" : heaps["C"]}
                     else:
@@ -104,7 +107,7 @@ def start_game(sock,num_players,wait_list_size,current_players):
                         cube_left=heap_sum(heaps)
                         if cube_left==0:
                             if validity == "Legal":
-                                send_dict[obj]=pack(">iiii4s",3,heap_dict[obj]["A"], heap_dict[obj]["B"], heap_dict[obj]["C"],"mesg".encode())
+                                send_dict[obj]=pack(">iiii4s",3, heap_dict[obj]["A"], heap_dict[obj]["B"], heap_dict[obj]["C"],"mesg".encode())
                             # else case isn't possible
                         elif cube_left==1:
                             if validity == "Legal":
@@ -118,8 +121,7 @@ def start_game(sock,num_players,wait_list_size,current_players):
 
 
         for obj in writable:
-            print("aaaaaaaaaaaaa")
-            bytes_sent = obj.send(send_dict[obj][:4])  # expect 20 bytes- 3 int's and 4 chars "mesg"
+            bytes_sent = obj.send(send_dict[obj][:4])# expect 20 bytes- 3 int's and 4 chars "mesg"
             send_dict[obj] = send_dict[obj][bytes_sent:]
 
             if send_dict[obj] == b"":  # finished to end
@@ -130,7 +132,7 @@ def nim_server(n_a, n_b, n_c,num_players,wait_list_size ,port):
     global sock
     global heaps
     create_socket()
-    bind_socket(port,wait_list_size)
+    bind_socket(port, wait_list_size)
     heaps={}
     while True:
         try:

@@ -79,7 +79,7 @@ def nim_client(hostname, port):
 
             bytes_sent=obj.send(send_dict[obj][:4]) # expect 12 bytes- 3 int's
             send_dict[obj] =send_dict[obj][bytes_sent:]
-            if send_dict[sock]==b"": # finished to send
+            if send_dict[obj]==b"": # finished to send
                 outputs.remove(obj)
                 print("sent")
 
