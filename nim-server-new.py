@@ -76,8 +76,13 @@ while True:
                                                        "mesg".encode())  # message to send
                         recv_dict[conn] = b""
 
-                    else:
-                         conn.close()
+                    else: # reject message
+                        send_dict[conn] = pack(">iiii4s", 7, heaps["A"], heaps["B"], heaps["C"],
+                                               "mesg".encode())
+                        sockets.append(conn)
+                        outputs.append(conn)
+                    '''    heaps_dict[conn] = {"A": heaps["A"], "B": heaps["B"], "C": heaps["C"]}
+                        recv_dict[conn] = b""  '''
 
             except OSError as error:
                 print("Failed to initialize connection with the client\n")
@@ -85,7 +90,7 @@ while True:
         else:
             packed = socket.recv(4)  # expect 16 bytes- 3 int's+ 4 chars
             if len(packed) == 0:
-                print("Disconnected from client")
+                print("Disconnected from client") # not exactly, if client was rejected, but ok..
 
                 sockets.remove(socket)
 

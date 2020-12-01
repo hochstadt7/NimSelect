@@ -19,7 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a27c4926-a480-432d-bf3e-00d27d0a8dcc" name="Default Changelist" comment="Minor fix in clientfunctions.py; prints Heap_B instead of Heap B.&#10;added nim-server-new.py;" />
+    <list default="true" id="a27c4926-a480-432d-bf3e-00d27d0a8dcc" name="Default Changelist" comment="Minor fix in clientfunctions.py; prints Heap_B instead of Heap B.&#10;added nim-server-new.py;">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientfunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/clientfunctions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nim-server-new.py" beforeDir="false" afterPath="$PROJECT_DIR$/nim-server-new.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nim.py" beforeDir="false" afterPath="$PROJECT_DIR$/nim.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

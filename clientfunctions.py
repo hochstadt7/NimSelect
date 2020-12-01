@@ -31,6 +31,9 @@ def game_seq_progress(message_type, heap_a,heap_b,heap_c):  # Returns True if ga
     elif (message_type == 6):
         print("You are waiting to play against the server!")
         indicator=True
+    elif (message_type == 7):
+        print("You are rejected by the server.")
+        indicator=False
     return indicator
 
 

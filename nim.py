@@ -12,13 +12,9 @@ def create_socket(hostname, port):
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except OSError as error:
-        print("Failed to initialize connection\n")
-        sys.exit(1)
-    try:
         sock.connect((hostname, port))
     except OSError as error:
-        print("You are rejected by the server.\n")
+        print("Failed to initialize connection")
         sys.exit(1)
 
 # initialize the connection, game
