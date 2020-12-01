@@ -52,7 +52,7 @@ def nim_client(hostname, port):
 
             else:
                 packed = obj.recv(4) # expect 20 bytes- 3 int's and 4 chars "mesg"
-                if packed is None:
+                if len(packed) == 0:
                     print("Disconnected from server\n")
                     sys.exit(1)
                 recv_dict[obj] += packed
