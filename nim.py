@@ -23,8 +23,8 @@ def nim_client(hostname, port):
     create_socket(hostname, port)
     inputs = [sock, sys.stdin]
     outputs = []
-    recv_dict = {sys.stdin: "",sock: b""}  # is it important to append sock to list after create_socket()? yes, think so..
-    send_dict = {sock: b""}
+    recv_dict = {sys.stdin: "",sock: b""}  # message from server
+    send_dict = {sock: b""} # message for server
     expect_input = 0
 
     while True:
@@ -36,27 +36,27 @@ def nim_client(hostname, port):
                 if len(recv_dict[obj]) == 1 and recv_dict[obj] == "Q":  # quit
                     sock.close()
                     sys.exit(1)
-                if not expect_input:
-                    recv_dict[obj] = ""  # too early input get dropped?
+                if not expect_input: # input not in client turn get dropped
+                    recv_dict[obj] = ""
                 else:
-                    expect_input = 0  # cuz now we already have input
+                    expect_input = 0
                     if clientfunctions.is_valid_input(recv_dict[obj]):
                         heap_letter, num = recv_dict[obj].split()
                         num = int(num)
                         heap_num = clientfunctions.pick_heap_num(heap_letter)
-                        send_dict[sock] = pack(">iii4s", 0, heap_num, num, "mesg".encode())# message for server
+                        send_dict[sock] = pack(">iii4s", 0, heap_num, num, "mesg".encode())
                     else:
                         send_dict[sock] = pack(">iii4s", 2, 0, 0, "mesg".encode())
-                    outputs.append(sock)  # want to be able to send to server
+                    outputs.append(sock)
                     recv_dict[obj] = ""
 
             else:
-                packed = obj.recv(4) # expect 20 bytes- 3 int's and 4 chars "mesg"
-                if len(packed) == 0:
-                    print("Disconnected from server\n")
+                packed = obj.recv(4)
+                if len(packed) == 0: # disconnection
+                    print("Disconnected from server")
                     sys.exit(1)
                 recv_dict[obj] += packed
-                if recv_dict[obj][-4:]== b"mesg":  # we read all the info
+                if recv_dict[obj][-4:]== b"mesg":  # message was fully read
                     data=unpack(">iiii",recv_dict[obj][:-4])
                     recv_dict[obj] = b""
                     message_type, heap_A, heap_B, heap_C =data
@@ -65,13 +65,13 @@ def nim_client(hostname, port):
                     if not game_continue:
                         sock.close()
                         sys.exit(1)
-                    if not message_type == 6: # the only case we dont want an input (except Q)
+                    if not message_type == 6: # no expected input from client in waiting list
                         expect_input = 1
 
         for obj in writable:
-            bytes_sent = obj.send(send_dict[obj][:4]) # expect 12 bytes- 3 int's
+            bytes_sent = obj.send(send_dict[obj][:4])
             send_dict[obj] = send_dict[obj][bytes_sent:]
-            if send_dict[obj] == b"": # finished to send
+            if send_dict[obj] == b"": # message was fully sent
                 outputs.remove(obj)
 
 
@@ -80,7 +80,7 @@ def nim_client(hostname, port):
 
 if __name__ == '__main__':
     if len(sys.argv) > 3:
-        print("Unappropriate arguments\n")
+        print("Unappropriate arguments")
         sys.exit(1)
 
     if len(sys.argv) == 3:
@@ -91,4 +91,3 @@ if __name__ == '__main__':
 
     else:
         nim_client('localhost', 6444)
-

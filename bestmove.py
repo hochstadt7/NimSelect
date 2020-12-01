@@ -1,4 +1,4 @@
-# we can use this for the bonus
+# bonus- best strategy for server
 
 def compute_nim_sum(heaps,num_heaps):
     nim_sum=0

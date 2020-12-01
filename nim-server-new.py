@@ -1,7 +1,7 @@
 import socket
 import sys
 from select import select
-
+from bestmove import *
 from serverfunctions import *
 from struct import *
 
@@ -47,14 +47,14 @@ send_dict = {}
 heaps_dict = {}
 
 while True:
-    '''In transmission protocol 0:INITIAL MESSAGE, 1:LEGAL, 2:ILLEGAL, 3:WIN, 4:LOSE, 5:QUIT, 6:INVALID INPUT'''
+    '''In transmission protocol 0:INITIAL MESSAGE, 1:LEGAL, 2:ILLEGAL, 3:WIN, 4:LOSE, 5:ILLEGAL AND GAMEOVER SIMULTANEOUSLY, 6:WAITING LIST' 7:REJECTION'''
     read, write, err = select(sockets, outputs, [])
     for socket in read:
         if socket == sock:
             try:
                 conn, addr = sock.accept()
                 print("connected by: ", addr)
-                if len(current_players) < num_players:
+                if len(current_players) < num_players: # new player
 
                     sockets.append(conn)
                     current_players.append(conn)
@@ -66,7 +66,7 @@ while True:
                     recv_dict[conn] = b""
 
                 else:
-                    if len(wait_list) < wait_list_size:
+                    if len(wait_list) < wait_list_size: # wait in the waiting list
                         sockets.append(conn)
                         wait_list.append(conn)
                         outputs.append(conn)
@@ -75,21 +75,20 @@ while True:
                                                        "mesg".encode())  # message to send
                         recv_dict[conn] = b""
 
-                    else: # reject message
+                    else: # rejection message
                         send_dict[conn] = pack(">iiii4s", 7, heaps["A"], heaps["B"], heaps["C"],
                                                "mesg".encode())
                         sockets.append(conn)
                         outputs.append(conn)
-                    '''    heaps_dict[conn] = {"A": heaps["A"], "B": heaps["B"], "C": heaps["C"]}
-                        recv_dict[conn] = b""  '''
+
 
             except OSError as error:
-                print("Failed to initialize connection with the client\n")
+                print("Failed to initialize connection with the client")
 
         else:
-            packed = socket.recv(4)  # expect 16 bytes- 3 int's+ 4 chars
-            if len(packed) == 0:
-                print("Disconnected from client") # not exactly, if client was rejected, but ok..
+            packed = socket.recv(4)
+            if len(packed) == 0: # # disconnection
+                print("Disconnected from client")
                 refused=0
                 sockets.remove(socket)
 
@@ -105,11 +104,9 @@ while True:
                     send_dict.pop(socket)
                 if socket in outputs:
                     outputs.remove(socket)
-
-
                 socket.close()
 
-                if len(wait_list) > 0 and not refused:
+                if len(wait_list) > 0 and not refused: # waiting player is allowed to play
 
                     new_player = wait_list[0]
                     current_players.append(new_player)
@@ -124,46 +121,52 @@ while True:
 
             else:
                 recv_dict[socket] += packed
-                if recv_dict[socket][-4:] == b"mesg":  # we read all the info
+                if recv_dict[socket][-4:] == b"mesg":  # message was fully read
                     outputs.append(socket)
                     data = unpack(">iii", recv_dict[socket][:12])
                     recv_dict[socket] = b""
                     message_type, heap_num, num_taken = data
 
-                    #  Illegal input. Special case when user input in invalid.
+                    #  illegal input. special case when user input in invalid.
                     if message_type == 2:
-                        server_heap_choice(heaps_dict[socket])
-                        send_dict[socket] = pack(">iiii4s", 2, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
+                        if heap_sum(heaps_dict[socket]) == 1: # illegal input and server win
+                            send_dict[socket] = pack(">iiii4s", 5, 0, 0, 0, "mesg".encode())
+                        else:
+                            server_heap_choice(heaps_dict[socket])
+                            send_dict[socket] = pack(">iiii4s", 2, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
                                                  heaps_dict[socket]["C"], "mesg".encode())
 
-                    if message_type != 2:
+                    else:
 
                         heap_letter = bring_heap_letter(int(heap_num))
                         validity = choice_validity(heaps_dict[socket], heap_letter, num_taken)
 
                         if validity == 'LEGAL':
-                            #  Win
+                            #  win
                             if heap_sum(heaps_dict[socket]) == 0:
-                                send_dict[socket] = pack(">iiii4s", 3, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
-                                                         heaps_dict[socket]["C"], "mesg".encode())
-                            #  Lose
+                                send_dict[socket] = pack(">iiii4s", 3, 0, 0,
+                                                         0, "mesg".encode())
+                            #  lose
                             elif heap_sum(heaps_dict[socket]) == 1:
-                                server_heap_choice(heaps_dict[socket]) #Take last one
-                                send_dict[socket] = pack(">iiii4s", 4, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
-                                                         heaps_dict[socket]["C"], "mesg".encode())
-                            #  Regular Progression
+                                server_heap_choice(heaps_dict[socket])
+                                send_dict[socket] = pack(">iiii4s", 4, 0, 0,
+                                                         0, "mesg".encode())
+                            #  regular progression
                             else:
                                 server_heap_choice(heaps_dict[socket])
                                 send_dict[socket] = pack(">iiii4s", 1, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
                                                          heaps_dict[socket]["C"], "mesg".encode())
                         elif validity == 'ILLEGAL':
-                            server_heap_choice(heaps_dict[socket])
-                            send_dict[socket] = pack(">iiii4s", 2, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
+                            if heap_sum(heaps_dict[socket]) == 1:
+                                send_dict[socket] = pack(">iiii4s", 5, 0, 0, 0, "mesg".encode()) # illegal move and server win
+                            else:
+                                server_heap_choice(heaps_dict[socket])
+                                send_dict[socket] = pack(">iiii4s", 2, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
                                                      heaps_dict[socket]["C"], "mesg".encode())
 
     for socket in write:
-        bytes_sent = socket.send(send_dict[socket][:4])  # expect 20 bytes- 3 int's and 4 chars "mesg"
+        bytes_sent = socket.send(send_dict[socket][:4])
         send_dict[socket] = send_dict[socket][bytes_sent:]
 
-        if send_dict[socket] == b"":  # finished to end
+        if send_dict[socket] == b"":  # message was fully sent
             outputs.remove(socket)

@@ -23,15 +23,15 @@ def game_seq_progress(message_type, heap_a,heap_b,heap_c):  # Returns True if ga
         print(f"Heap A: {heap_a}", f"Heap B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
         print("Server win!")
         indicator = False
-    elif (message_type == 5):  # instead of QUIT- illegal and gameover both
+    elif (message_type == 5):  # ILLEGAL AND GAMEOVER SIMULTANEOUSLY
         print("Illegal move")
         print("Heap A: 0 Heap B: 0 Heap C: 0")
         print("Server win!") # client can't win in such a case
         indicator = False
-    elif (message_type == 6):
-        print("You are waiting to play against the server!")
+    elif (message_type == 6): # WAITING LIST
+        print("Waiting to play against the server.")
         indicator=True
-    elif (message_type == 7):
+    elif (message_type == 7): # REJECTION
         print("You are rejected by the server.")
         indicator=False
     return indicator

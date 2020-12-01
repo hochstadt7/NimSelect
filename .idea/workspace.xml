@@ -19,8 +19,17 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    p
-    <list default="true" id="a27c4926-a480-432d-bf3e-00d27d0a8dcc" name="Default Changelist" comment="Minor fix in clientfunctions.py; prints Heap_B instead of Heap B.&#10;added nim-server-new.py;" />
+    <list default="true" id="a27c4926-a480-432d-bf3e-00d27d0a8dcc" name="Default Changelist" comment="Minor fix in clientfunctions.py; prints Heap_B instead of Heap B.&#10;added nim-server-new.py;">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/best-move.py" beforeDir="false" afterPath="$PROJECT_DIR$/bestmove.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientfunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/clientfunctions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nim-server-new.py" beforeDir="false" afterPath="$PROJECT_DIR$/nim-server-new.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nim.py" beforeDir="false" afterPath="$PROJECT_DIR$/nim.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,6 +41,9 @@
         <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="Git.Pull.Settings">
+    <option name="BRANCH" value="master" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -122,7 +134,8 @@
     <MESSAGE value="nim.py; in writable loop changed send_dict[sock] to send_dict[obj]" />
     <MESSAGE value="nim.py; using sock instead of obj." />
     <MESSAGE value="Minor fix in clientfunctions.py; prints Heap_B instead of Heap B.&#10;added nim-server-new.py;" />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor fix in clientfunctions.py; prints Heap_B instead of Heap B.&#10;added nim-server-new.py;" />
+    <MESSAGE value="Server dealing with rejected client" />
+    <option name="LAST_COMMIT_MESSAGE" value="Server dealing with rejected client" />
   </component>
   <component name="WindowStateProjectService">
     <state width="1362" height="142" key="GridCell.Tab.0.bottom" timestamp="1606767351826">
