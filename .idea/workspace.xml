@@ -21,9 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a27c4926-a480-432d-bf3e-00d27d0a8dcc" name="Default Changelist" comment="Minor fix in clientfunctions.py; prints Heap_B instead of Heap B.&#10;added nim-server-new.py;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientfunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/clientfunctions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nim-server-new.py" beforeDir="false" afterPath="$PROJECT_DIR$/nim-server-new.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nim.py" beforeDir="false" afterPath="$PROJECT_DIR$/nim.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +105,13 @@
       <option name="project" value="LOCAL" />
       <updated>1606761485373</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL‎00004" summary="Minor fix in clientfunctions.py; prints Heap_B instead of Heap B.&#10;added nim-server-new.py;">
+      <created>1606835330380</created>
+      <option name="number" value="LOCAL‎00004" />
+      <option name="presentableId" value="LOCAL‎00004" />
+      <updated>1606835330380</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -149,10 +153,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="583" y="161" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1606731919149" />
-    <state x="674" y="249" key="Vcs.Push.Dialog.v2" timestamp="1606767345252">
+    <state x="674" y="249" key="Vcs.Push.Dialog.v2" timestamp="1606835351210">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="674" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1606767345252" />
+    <state x="674" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1606835351210" />
     <state x="743" y="444" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1606827541682">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

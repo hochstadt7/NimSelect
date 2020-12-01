@@ -46,7 +46,6 @@ recv_dict = {sock: b""}
 send_dict = {}
 heaps_dict = {}
 
-
 while True:
     '''In transmission protocol 0:INITIAL MESSAGE, 1:LEGAL, 2:ILLEGAL, 3:WIN, 4:LOSE, 5:QUIT, 6:INVALID INPUT'''
     read, write, err = select(sockets, outputs, [])
@@ -91,14 +90,15 @@ while True:
             packed = socket.recv(4)  # expect 16 bytes- 3 int's+ 4 chars
             if len(packed) == 0:
                 print("Disconnected from client") # not exactly, if client was rejected, but ok..
-
+                refused=0
                 sockets.remove(socket)
 
                 if socket in wait_list:
                     wait_list.remove(socket)
-                else:
+                elif socket in current_players:
                     current_players.remove(socket)
                     heaps_dict.pop(socket)
+                else: refused=1
                 if socket in recv_dict:
                     recv_dict.pop(socket)
                 if socket in send_dict:
@@ -109,7 +109,7 @@ while True:
 
                 socket.close()
 
-                if len(wait_list) > 0:
+                if len(wait_list) > 0 and not refused:
 
                     new_player = wait_list[0]
                     current_players.append(new_player)
