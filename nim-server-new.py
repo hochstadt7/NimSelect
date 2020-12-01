@@ -129,10 +129,10 @@ while True:
 
                     #  illegal input. special case when user input in invalid.
                     if message_type == 2:
-                        if heap_sum(heaps_dict[socket]) == 1: # illegal input and server win
+                        comp_move(heaps_dict[socket],3)
+                        if heap_sum(heaps_dict[socket]) == 0: # illegal input and server win
                             send_dict[socket] = pack(">iiii4s", 5, 0, 0, 0, "mesg".encode())
                         else:
-                            server_heap_choice(heaps_dict[socket])
                             send_dict[socket] = pack(">iiii4s", 2, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
                                                  heaps_dict[socket]["C"], "mesg".encode())
 
@@ -146,21 +146,20 @@ while True:
                             if heap_sum(heaps_dict[socket]) == 0:
                                 send_dict[socket] = pack(">iiii4s", 3, 0, 0,
                                                          0, "mesg".encode())
-                            #  lose
-                            elif heap_sum(heaps_dict[socket]) == 1:
-                                server_heap_choice(heaps_dict[socket])
-                                send_dict[socket] = pack(">iiii4s", 4, 0, 0,
-                                                         0, "mesg".encode())
                             #  regular progression
                             else:
-                                server_heap_choice(heaps_dict[socket])
-                                send_dict[socket] = pack(">iiii4s", 1, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
+                                comp_move(heaps_dict[socket],3)
+                                if heap_sum(heaps_dict[socket]) == 0:
+                                    send_dict[socket] = pack(">iiii4s", 4, 0, 0,
+                                                             0, "mesg".encode())
+                                else:
+                                    send_dict[socket] = pack(">iiii4s", 1, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
                                                          heaps_dict[socket]["C"], "mesg".encode())
                         elif validity == 'ILLEGAL':
-                            if heap_sum(heaps_dict[socket]) == 1:
-                                send_dict[socket] = pack(">iiii4s", 5, 0, 0, 0, "mesg".encode()) # illegal move and server win
+                            comp_move(heaps_dict[socket], 3)
+                            if heap_sum(heaps_dict[socket]) == 0:  # illegal turn and server win
+                                send_dict[socket] = pack(">iiii4s", 5, 0, 0, 0, "mesg".encode())
                             else:
-                                server_heap_choice(heaps_dict[socket])
                                 send_dict[socket] = pack(">iiii4s", 2, heaps_dict[socket]["A"], heaps_dict[socket]["B"],
                                                      heaps_dict[socket]["C"], "mesg".encode())
 

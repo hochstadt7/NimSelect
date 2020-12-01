@@ -16,11 +16,6 @@ def heap_sum(heap_dict):
     return sum
 
 
-def server_heap_choice(heap_dict):
-    max_heap = max(heap_dict, key=heap_dict.get)
-    heap_dict[max_heap] -= 1
-
-
 def data_to_send(message_type, heap_dict):
     return struct.pack("i i i i", message_type, heap_dict['A'], heap_dict['B'], heap_dict['C'])
 
