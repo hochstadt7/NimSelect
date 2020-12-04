@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 def game_seq_progress(message_type, heap_a,heap_b,heap_c):  # Returns True if game continues and False if game is over.
     indicator = True
@@ -25,7 +26,7 @@ def game_seq_progress(message_type, heap_a,heap_b,heap_c):  # Returns True if ga
         indicator = False
     elif (message_type == 5):  # ILLEGAL AND GAMEOVER SIMULTANEOUSLY
         print("Illegal move")
-        print("Heap A: 0 Heap B: 0 Heap C: 0")
+        print(f"Heap A: {heap_a}", f"Heap B: {heap_b}", f"Heap C: {heap_c}", sep="\n")
         print("Server win!") # client can't win in such a case
         indicator = False
     elif (message_type == 6): # WAITING LIST
@@ -46,7 +47,7 @@ def is_valid_input(input_string):
         if heap_letter not in ['A', 'B', 'C']:
             return False
         try:
-            if float(num) < 0 or int(float(num)) != float(num):
+            if float(num) <= 0 or int(float(num)) != float(num):
                 return False
         except ValueError:
             return False

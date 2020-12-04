@@ -33,7 +33,8 @@ def nim_client(hostname, port):
             if obj is sys.stdin:
                 packed = input()
                 recv_dict[obj] += packed
-                if len(recv_dict[obj]) == 1 and recv_dict[obj] == "Q":  # quit
+                splitter=recv_dict[obj].split()
+                if len(splitter) == 1 and splitter[0] == "Q":  # quit
                     sock.close()
                     sys.exit(1)
                 if not expect_input: # input not in client turn get dropped
