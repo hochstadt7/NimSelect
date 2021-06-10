@@ -1,3 +1,3 @@
 # NimSelect
 
-Nim game implemented in python, at Comunnication network course.
+Nim game implemented in python, at Communication Networks course.
